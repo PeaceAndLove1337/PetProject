@@ -14,6 +14,8 @@ public class ParallelParser {
     ExecutorService executorService;
     Map<Bank, CurrencyParser> currencyParsers;
 
+    //TODO решить вопрос с currencyParsers в конструкторе, т.к. ParallelParser по сути своей механизм общего назначения,
+    // а в него кладется конкретная сущность
     public ParallelParser(ExecutorService executorService, Map<Bank, CurrencyParser> currencyParsers) {
         this.executorService = executorService;
         this.currencyParsers = currencyParsers;
@@ -29,47 +31,7 @@ public class ParallelParser {
                     responsesToParse.get(key))));
         }
 
-      /*  for (Map.Entry<Bank, String> entry : responsesToParse.entrySet()) {
-            switch (entry.getKey()) {
-                case CB:
-                    futures.add(
-                            executorService.submit(
-                            new CurrencyParserCallable(currencyParsers.get(Bank.CB), entry.getValue())
-                            )
-                    );
-                    break;
-                case VTB:
-                    futures.add(
-                            executorService.submit(
-                                    new CurrencyParserCallable(currencyParsers.get(Bank.VTB), entry.getValue())
-                            )
-                    );
-                    break;
-                case TINKOFF:
-                    futures.add(
-                            executorService.submit(
-                                    new CurrencyParserCallable(currencyParsers.get(Bank.TINKOFF), entry.getValue())
-                            )
-                    );
-                    break;
-                case SBERBANK:
-                    futures.add(
-                            executorService.submit(
-                                    new CurrencyParserCallable(currencyParsers.get(Bank.SBERBANK), entry.getValue())
-                            )
-                    );
-                    break;
-                case ALPHABANK:
-                    futures.add(
-                            executorService.submit(
-                                    new CurrencyParserCallable(currencyParsers.get(Bank.ALPHABANK), entry.getValue())
-                            )
-                    );
-                    break;
-
-            }
-        }*/
-
+        //todo анно решить задачу get'a
         futures.forEach(
                 it -> {
                     try {
