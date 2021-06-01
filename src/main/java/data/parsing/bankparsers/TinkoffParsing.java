@@ -42,7 +42,7 @@ public class TinkoffParsing implements CurrencyParser {
         JsonNode lastUpdateNode = mainNode.get("lastUpdate");
         String lastUpdate = lastUpdateNode.get("milliseconds").asText();
 
-        //todo Почему то иногда падает NPE ??????
+        //Почему то иногда падает NPE ??????
         // Падает потому что почему-то иногда в респонс не прилетает Buy/cost... у некоторых валют..
 
         nodesWithRUB.forEach(it -> resultList.add(

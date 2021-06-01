@@ -2,52 +2,72 @@ package data.parsing;
 
 import BankResponseModels.CurrencyResponseModel;
 import data.Bank;
+import data.wrappers.ParsedCurrencyResponseWrapper;
 import data.parsing.bankparsers.CurrencyParser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
+/**
+ * Общий механизм для параллельного парсинга реквестов с банковских API
+ */
 public class ParallelParser {
 
     ExecutorService executorService;
     Map<Bank, CurrencyParser> currencyParsers;
 
-    //TODO решить вопрос с currencyParsers в конструкторе, т.к. ParallelParser по сути своей механизм общего назначения,
-    // а в него кладется конкретная сущность
+    /**
+     * @param executorService - сюда нужно положить глобально созданный Executors.newFixedThreadPool(№),
+     *                        где № - колво банков, на которые нужно ходить параллельно
+     * @param currencyParsers - карта заранее созданных парсеров, которые будут использоваться при парсинге
+     */
     public ParallelParser(ExecutorService executorService, Map<Bank, CurrencyParser> currencyParsers) {
         this.executorService = executorService;
         this.currencyParsers = currencyParsers;
     }
 
-    public List<CurrencyResponseModel> parallelCurrencyParse(Map<Bank, String> responsesToParse) {
-        List<CurrencyResponseModel> resultList = new ArrayList<>();
+    /**
+     * Данный метод принимает в себя набор респонсов на парсинг и возвращает обёрнутый список моделей респонсов
+     */
+    public ParsedCurrencyResponseWrapper parallelCurrencyParse(Map<Bank, String> responsesToParse) {
 
-        List<Future<List<? extends CurrencyResponseModel>>> futures = new ArrayList<>();
+        ParsedCurrencyResponseWrapper result = new ParsedCurrencyResponseWrapper();
 
+        //List<CurrencyResponseModel> resultList = new ArrayList<>();
+
+        //List<Future<List<? extends CurrencyResponseModel>>> futures = new ArrayList<>();
+
+        List<CurrencyResponseModel> inWrapperList = result.getCurrencyResponseModelsList();
         for (Bank key : responsesToParse.keySet()) {
-            futures.add(executorService.submit(new CurrencyParserCallable(currencyParsers.get(key),
-                    responsesToParse.get(key))));
+            CompletableFuture.supplyAsync(() ->
+                    currencyParsers.get(key)
+                            .parseCurrency(responsesToParse.get(key))
+                    , executorService)
+            .thenAccept(inWrapperList::addAll);
+         /*   futures.add(executorService.submit(new CurrencyParserCallable(currencyParsers.get(key),
+                    responsesToParse.get(key))));*/
         }
 
-        //todo анно решить задачу get'a
+     /*   //todo анно решить задачу get'a
         futures.forEach(
                 it -> {
                     try {
-                        List<? extends CurrencyResponseModel> current=  it.get(2000, TimeUnit.MILLISECONDS);
+                        List<? extends CurrencyResponseModel> current = it.get(2000, TimeUnit.MILLISECONDS);
                         resultList.addAll(current);
                     } catch (InterruptedException | TimeoutException | ExecutionException e) {
                         e.printStackTrace();
                     }
                 }
-        );
+        );*/
 
         //executorService.shutdown();
 
-        return resultList;
+        return result;
     }
 
+
+  /*  //После переписывания на CompletableFuture данный класс не нужон.
     class CurrencyParserCallable implements Callable<List<? extends CurrencyResponseModel>> {
 
         CurrencyParser currencyParser;
@@ -62,6 +82,6 @@ public class ParallelParser {
         public List<? extends CurrencyResponseModel> call() {
             return currencyParser.parseCurrency(response);
         }
-    }
+    }*/
 
 }

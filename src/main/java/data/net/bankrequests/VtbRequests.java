@@ -1,8 +1,12 @@
 package data.net.bankrequests;
 
 import data.Bank;
+import data.models.BaseResponse;
 import data.net.core.LightRequest;
 import kotlin.Pair;
+
+import java.io.IOException;
+import java.util.Locale;
 
 public class VtbRequests implements CurrencyRequester {
     String vtbCurrencyApiURL = "https://www.vtb.ru/api/currency-exchange/table-info?contextItemId=%7BC5471052-2291-" +
@@ -12,13 +16,30 @@ public class VtbRequests implements CurrencyRequester {
             "%2Fpersonal%2Fplatezhi-i-perevody%2Fobmen-valjuty%2Fspezkassy%2F;Multiply100JPYand10SEK__1";
 
     @Override
-    public Pair<Bank, String> getCurrencyResponse(String... params) {
+    public BaseResponse<Pair<Bank, String>> getCurrencyResponse(String... params) {
         LightRequest request= LightRequest
                 .getBuilder()
                 .addEncoding("utf-8")
                 .addUrl(vtbCurrencyApiURL)
                 .build();
-        return new Pair(Bank.VTB, request.getResponse());
+        try {
+            String response = request.getResponse();
+            String responseInLower = response.toLowerCase(Locale.ROOT);
+            if (!(responseInLower.contains("error") ||
+                    responseInLower.contains("reject"))) {
+                return new BaseResponse<Pair<Bank, String>>(true,
+                        new Pair(Bank.VTB, response),
+                        null);
+            } else {
+                return new BaseResponse<>(false,
+                        null,
+                        response);
+            }
+        } catch (IOException e) {
+            return new BaseResponse<>(false,
+                    null,
+                    e.getMessage());
+        }
     }
 
 }

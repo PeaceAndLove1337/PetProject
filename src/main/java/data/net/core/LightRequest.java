@@ -10,8 +10,6 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.stream.Collectors;
 
-//todo при проектировании многопоточных походов в сеть нужно будет использовать тредпулы(колво которых будет
-// равно колчичеству юзаемых API (заметим, что в сеть нужно ходить многопоточно по всем апишкам сразу)
 
 /**
  * Общий механизм для походов в сеть. Паттерн "Builder"
@@ -30,18 +28,12 @@ public class LightRequest {
      *  Делает запрос по сформированному URL'у и вовзвращает ответ в виде строки
      *  Под капотом использует java.net и java.io (для преобразования ответа в строку)
      */
-    public String getResponse() {
-        String result = null;
-        try {
+    public String getResponse() throws IOException {
             URLConnection uRLConnection = url.openConnection();
             InputStream inputStream = uRLConnection.getInputStream();
-            result = new BufferedReader(new InputStreamReader(inputStream, encoding))
-                    .lines().collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return result;
+        return new BufferedReader(new InputStreamReader(inputStream, encoding))
+                    .lines().collect(Collectors.joining("\n"));
     }
 
 
