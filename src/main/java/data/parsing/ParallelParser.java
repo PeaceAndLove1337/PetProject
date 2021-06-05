@@ -42,29 +42,10 @@ public class ParallelParser {
             .thenAccept(inWrapperList::addAll);
         }
 
-
-
         //executorService.shutdown();
 
         return result;
     }
 
-
-  /*  //После переписывания на CompletableFuture данный класс не нужон.
-    class CurrencyParserCallable implements Callable<List<? extends CurrencyResponseModel>> {
-
-        CurrencyParser currencyParser;
-        String response;
-
-        public CurrencyParserCallable(CurrencyParser currencyParser, String response) {
-            this.currencyParser = currencyParser;
-            this.response = response;
-        }
-
-        @Override
-        public List<? extends CurrencyResponseModel> call() {
-            return currencyParser.parseCurrency(response);
-        }
-    }*/
 
 }

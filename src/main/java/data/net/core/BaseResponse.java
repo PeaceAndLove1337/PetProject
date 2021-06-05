@@ -1,5 +1,9 @@
 package data.net.core;
 
+/**
+ * Класс стандартного респонса, имеющий поле isSuccessful
+ * @param <T> Тело респонса
+ */
 public class BaseResponse <T> {
 
     private final boolean isSuccessful;

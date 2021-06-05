@@ -74,44 +74,5 @@ public class ParallelRequests {
         return result;
     }
 
-  /*
-    //todo не очень разумное решение?! Грузим стек...
-    private void asyncTakeCurrency(CurrencyRequester currencyRequester, String[] params,
-                                   ResponsesWrapper responsesWrapper, Integer attempt){
-        CompletableFuture.supplyAsync(() ->
-                currencyRequester.getCurrencyResponse(params), executorService
-        )
-                .thenAccept(currResult -> {
-                            if (currResult.isSuccessful())
-                                responsesWrapper.getResponses()
-                                        .put(currResult.getBody().component1(), currResult.getBody().component2());
-                            else if (attempt<MAX_RETRIES){
-                                asyncTakeCurrency(currencyRequester, params, responsesWrapper, attempt+1);
-                            }
-                        }
-                );
-    }*/
 
 }
-
-
-/*//После переписывания на CompletableFuture данный класс не нужон.
-class CurrencyRequesterCallable implements Callable<Pair<Bank, String>> {
-
-    CurrencyRequester currencyRequester;
-    String params[];
-
-    public CurrencyRequesterCallable(CurrencyRequester currencyRequester, String... params) {
-        this.currencyRequester = currencyRequester;
-        this.params = params;
-    }
-
-    @Override
-    public Pair<Bank, String> call() {
-        if (params == null)
-            return currencyRequester.getCurrencyResponse();
-        else
-            return currencyRequester.getCurrencyResponse(params);
-    }
-
-}*/

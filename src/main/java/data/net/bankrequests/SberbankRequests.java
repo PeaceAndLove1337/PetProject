@@ -32,7 +32,7 @@ public class SberbankRequests extends BaseResponsibleRequester implements Curren
     }};
 
     /**
-     * @param params Параметры в формате "840" - цифровой номер валюты
+     * @param params Параметры в формате "ххх" - цифровой номер валюты, например "840"
      */
     @Override
     public BaseResponse<Pair<Bank, String>> getCurrencyResponse(String ... params) {
