@@ -1,10 +1,10 @@
-package data.models;
+package data.net.core;
 
 public class BaseResponse <T> {
 
-    private boolean isSuccessful;
-    private T body;
-    private String error;
+    private final boolean isSuccessful;
+    private final T body;
+    private final String error;
 
     public BaseResponse(boolean isSuccessful, T body, String error){
         this.isSuccessful=isSuccessful;

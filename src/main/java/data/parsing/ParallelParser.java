@@ -2,7 +2,7 @@ package data.parsing;
 
 import BankResponseModels.CurrencyResponseModel;
 import data.Bank;
-import data.wrappers.ParsedCurrencyResponseWrapper;
+import data.parsing.wrappers.ParsedCurrencyResponseWrapper;
 import data.parsing.bankparsers.CurrencyParser;
 
 import java.util.List;
@@ -33,11 +33,6 @@ public class ParallelParser {
     public ParsedCurrencyResponseWrapper parallelCurrencyParse(Map<Bank, String> responsesToParse) {
 
         ParsedCurrencyResponseWrapper result = new ParsedCurrencyResponseWrapper();
-
-        //List<CurrencyResponseModel> resultList = new ArrayList<>();
-
-        //List<Future<List<? extends CurrencyResponseModel>>> futures = new ArrayList<>();
-
         List<CurrencyResponseModel> inWrapperList = result.getCurrencyResponseModelsList();
         for (Bank key : responsesToParse.keySet()) {
             CompletableFuture.supplyAsync(() ->
@@ -45,21 +40,9 @@ public class ParallelParser {
                             .parseCurrency(responsesToParse.get(key))
                     , executorService)
             .thenAccept(inWrapperList::addAll);
-         /*   futures.add(executorService.submit(new CurrencyParserCallable(currencyParsers.get(key),
-                    responsesToParse.get(key))));*/
         }
 
-     /*   //todo анно решить задачу get'a
-        futures.forEach(
-                it -> {
-                    try {
-                        List<? extends CurrencyResponseModel> current = it.get(2000, TimeUnit.MILLISECONDS);
-                        resultList.addAll(current);
-                    } catch (InterruptedException | TimeoutException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-        );*/
+
 
         //executorService.shutdown();
 

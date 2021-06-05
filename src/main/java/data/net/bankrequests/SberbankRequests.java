@@ -1,15 +1,13 @@
 package data.net.bankrequests;
 
 import data.Bank;
-import data.models.BaseResponse;
+import data.net.core.BaseResponse;
 import data.net.core.LightRequest;
 import kotlin.Pair;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Locale;
 
-public class SberbankRequests implements CurrencyRequester {
+public class SberbankRequests extends BaseResponsibleRequester implements CurrencyRequester {
 
     String sberbankCurrencyApiURL = "https://www.sberbank.ru/portalserver/proxy/?pipe=" +
             "shortCachePipe&url=http%3A%2F%2Flocalhost%2Frates-web%2FrateService%2Frate%2Fcurrent%3Fregion" +
@@ -45,23 +43,6 @@ public class SberbankRequests implements CurrencyRequester {
                 .addParams(params)
                 .build();
 
-        try {
-            String response = request.getResponse();
-            String responseInLower = response.toLowerCase(Locale.ROOT);
-            if (!(responseInLower.contains("error") ||
-                    responseInLower.contains("reject"))) {
-                return new BaseResponse<Pair<Bank, String>>(true,
-                        new Pair(Bank.SBERBANK, response),
-                        null);
-            } else {
-                return new BaseResponse<>(false,
-                        null,
-                        response);
-            }
-        } catch (IOException e) {
-            return new BaseResponse<>(false,
-                    null,
-                    e.getMessage());
-        }
+        return getCurrencyBaseResponse(request, Bank.SBERBANK);
     }
 }

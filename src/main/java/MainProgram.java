@@ -1,10 +1,10 @@
 import data.Bank;
 import data.net.ParallelRequests;
 import data.net.bankrequests.*;
-import data.wrappers.ParsedCurrencyResponseWrapper;
-import data.wrappers.ResponsesWrapper;
 import data.parsing.ParallelParser;
 import data.parsing.bankparsers.*;
+import data.parsing.wrappers.ParsedCurrencyResponseWrapper;
+import data.net.wrappers.ResponsesWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,10 +16,10 @@ public class MainProgram {
     public static void main(String[] args) {
 
         /*todo
-        *  1) Обработка ошибок при походе в сеть?!
-        *  2) Паттерны проектирования -> поменять название ParallelRequests
-        *  3) Кэширование/переход в domain-слой?
-        * */
+         *  1) Обработка ошибок при походе в сеть?!
+         *  2) Паттерны проектирования -> поменять название ParallelRequests, воспользовавшись названием соответственного паттерна
+         *  3) Кэширование/переход в domain-слой?
+         * */
         Map<CurrencyRequester, String[]> currencyRequests = new HashMap<CurrencyRequester, String[]>() {{
             put(new SberbankRequests(), new String[]{"840"});
             put(new CbRequests(), new String[]{"27/05/2021"});

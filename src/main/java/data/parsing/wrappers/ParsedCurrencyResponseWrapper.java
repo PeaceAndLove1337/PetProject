@@ -1,4 +1,4 @@
-package data.wrappers;
+package data.parsing.wrappers;
 
 import BankResponseModels.CurrencyResponseModel;
 

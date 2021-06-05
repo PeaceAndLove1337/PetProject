@@ -1,4 +1,4 @@
-package data.wrappers;
+package data.net.wrappers;
 
 import data.Bank;
 

@@ -3,11 +3,13 @@ package data.net;
 
 import data.Bank;
 import data.net.bankrequests.CurrencyRequester;
-import data.wrappers.ResponsesWrapper;
+import data.net.core.BaseResponse;
+import data.net.wrappers.ResponsesWrapper;
 import kotlin.Pair;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 
 /**
@@ -19,7 +21,11 @@ public class ParallelRequests {
 
     ExecutorService executorService;
 
-    //private static final int MAX_RETRIES = 3;
+    /**
+     * Максимальное количество перезапросов в случае неудачи
+     */
+    final int maxCountOfAttempts = 3;
+
     /**
      * @param executorService - сюда нужно положить глобально созданный Executors.newFixedThreadPool(№),
      *                        где № - колво банков, на которые нужно ходить параллельно
@@ -37,13 +43,31 @@ public class ParallelRequests {
 
         Map<Bank, String> responsesInWrapper = result.getResponses();
         for (Map.Entry<CurrencyRequester, String[]> entry : currencyRequestsWithParams.entrySet()) {
-            CompletableFuture.supplyAsync(() ->
-                    entry.getKey().getCurrencyResponse(entry.getValue()), executorService
+            CompletableFuture.supplyAsync(() -> {
+                        BaseResponse<Pair<Bank, String>> baseResponse = entry.getKey().getCurrencyResponse(entry.getValue());
+                        int countOfAttempts = 0;
+                        while (!baseResponse.isSuccessful() || countOfAttempts < maxCountOfAttempts) {
+                            baseResponse = entry.getKey().getCurrencyResponse(entry.getValue());
+                            countOfAttempts++;
+                        }
+                        return baseResponse;
+                    }, executorService
             )
                     .thenAccept(currResult ->
-                            responsesInWrapper.put(currResult.getBody().component1(),
-                            currResult.getBody().component2()));
+                            {
+                                /*
+                                 todo Открытый вопрос: что делать с BaseRespons'ом если он остался неуспешным?!
+                                  Бросать exception?
+
+                                 */
+                                if (currResult.isSuccessful())
+                                    responsesInWrapper.put(
+                                            currResult.getBody().component1(),
+                                            currResult.getBody().component2());
+                            }
+                    );
         }
+
 
         //executorService.shutdown();
 
